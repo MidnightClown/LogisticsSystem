@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.dao.LoginUserDao">
+  <!-- id对应下面的resultMap属性名，type对应相应的实体类，这个标签可以写多个 -->
+  <resultMap type="LoginUser" id="LoginUserMap">
+  	<!-- 第一列用id标签对应，property表示实体类的属性，column表示数据库中的字段 -->
+  	<id property="u_id" column="u_id" />
+  	<!-- 其他列用result标签对应 -->
+  	<result property="u_name" column="u_name"/>
+  	<result property="u_password" column="u_password"/>
+  	<result property="u_identity" column="u_identity"/>
+  </resultMap>
+  <!-- 当数据库和实体类中的字段一样的时候用resultType;不一样的时候用resultMap，然后需要加上面的对应关系 -->
+  <select id="login" parameterType="LoginUser" resultMap="LoginUserMap">
+  	select * from LoginUser where u_name = #{u_name} and u_password = #{u_password}
+  </select>
+  
+  
+  <insert id="addUser" parameterType="LoginUser">
+  	insert into LoginUser(u_name,u_password,u_identity) values(#{u_name},#{u_password},#{u_identity})
+  </insert>
+  
+  
+  <delete id="delUser" parameterType="LoginUser">
+  	delete from LoginUser where u_id = #{u_id}
+  </delete>
+  <update id="updateUser" parameterType="LoginUser">
+  	update LoginUser set u_name = #{u_name}, u_password = #{u_password}, u_identity = #{u_identity} where u_id = #{u_id}
+  </update>
+  
+  
+  <select id="getAllUsers" resultType="LoginUser">
+  	select * from LoginUser
+  </select>
+  
+  <!-- 模糊查询 -->
+  <select id="getUsersByName" resultType="LoginUser">
+  	select * from LoginUser where u_name like concat(concat('%',#{u_name}),'%')
+  </select>
+  
+  <!-- 动态查询模糊查询：id=3,name包含'a' 密码=12345 -->
+  <select id="getDynamicUsers" parameterType="LoginUser" resultType="LoginUser">
+  	select * from LoginUser
+  	<where>
+	  	<if test="u_id!=null">
+	  		u_id = #{u_id}
+	  	</if>
+	  	<if test="u_name!=null">
+	  		and u_name like concat(concat('%',#{u_name}),'%') 
+	  	</if>
+	  	<if test="u_password!=null">
+	  		and u_password = #{u_password}
+	  	</if>
+	</where>
+  </select>
+  
+  
+  
+  <resultMap type="LoginUser" id="getAllOrders">
+  	<id property="u_id" column="u_id"/>
+  	<result property="u_name" column="u_name"/>
+  	<result property="u_password" column="u_password"/>
+  	<result property="u_identity" column="u_identity"/>
+  	<collection property="orderList" ofType="Orders">
+  		<id property="id" column="o_id"/>
+  		<result property="name" column="o_name"/>
+  	</collection>
+  </resultMap>
+  <select id="getAllOrders" resultMap="getAllOrders">
+  	select o.o_id,o.o_name,u.* from Orders o,LoginUser u where u.u_id = #{id}
+  </select>
+  
+</mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.dao.OrdersDao">
+	<resultMap type="Orders" id="Order">
+		<id property="id" column="o_id"/>
+		<result property="name" column="o_name"/>
+		<!-- property代表order中的代表类的变量名,javaType代表变量名的类型 -->
+		<association property="loginUser" javaType="LoginUser">
+  			<!-- 其他列用result标签对应 -->
+			<id property="u_id" column="u_id" />
+  			<result property="u_name" column="u_name"/>
+  			<result property="u_password" column="u_password"/>
+  			<result property="u_identity" column="u_identity"/> 
+		</association>
+	</resultMap>
+	<select id="getOrder" resultMap="Order">
+		select o.o_id,o.o_name,u.* from Orders o,LoginUser u where o.u_id = #{id}
+	</select>
+</mapper>
